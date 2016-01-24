@@ -94,9 +94,9 @@ log.debug("MITMf started: {}".format(sys.argv))
 #Start Net-Creds
 print "[*] MITMf v{} - '{}'".format(mitmf_version, mitmf_codename)
 
-NetCreds().start(options.interface, options.ip)
-print "|"
-print "|_ Net-Creds v{} online".format(NetCreds.version)
+# NetCreds().start(options.interface, options.ip)
+#print "|"
+#print "|_ Net-Creds v{} online".format(NetCreds.version)
 
 from core.proxyplugins import ProxyPlugins
 
