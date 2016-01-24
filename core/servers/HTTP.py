@@ -18,7 +18,7 @@ import os
 import struct
 import core.responder.settings as settings
 import threading
-
+import urllib2
 from SocketServer import BaseServer, BaseRequestHandler, StreamRequestHandler, ThreadingMixIn, TCPServer
 from base64 import b64decode, b64encode
 from core.responder.utils import *
@@ -191,9 +191,10 @@ def GrabURL(data, host):
 
 # Handle HTTP packet sequence.
 def PacketSequence(data, client):
-	NTLM_Auth = re.findall('(?<=Authorization: NTLM )[^\\r]*', data)
-	Basic_Auth = re.findall('(?<=Authorization: Basic )[^\\r]*', data)
-
+	#NTLM_Auth = re.findall('(?<=Authorization: NTLM )[^\\r]*', data)
+	#Basic_Auth = re.findall('(?<=Authorization: Basic )[^\\r]*', data)
+	NTLM_Auth = ""
+	Basic_Auth = ""
 	# Serve the .exe if needed
 	if settings.Config.Serve_Always == True or (settings.Config.Serve_Exe == True and re.findall('.exe', data)):
 		return RespondWithFile(client, settings.Config.Exe_Filename, settings.Config.Exe_DlName)
@@ -265,9 +266,15 @@ def PacketSequence(data, client):
 				log.info("{} [HTTP] Sending BASIC authentication request".format(client))
 
 		else:
-			Response = IIS_Auth_401_Ans()
-			if settings.Config.Verbose:
-				log.info("{} [HTTP] Sending NTLM authentication request".format(client))
+			hst = GrabHost(data, client)
+			rsc = GrabURL(data, client)
+			getting = 'http://%s%s' % (hst,rsc)
+			print getting
+			response = urllib2.urlopen(getting)
+			Response = response.read()
+		#	Response = IIS_Auth_401_Ans()
+		#	if settings.Config.Verbose:
+		#		log.info("{} [HTTP] Sending NTLM authentication request".format(client))
 
 		return str(Response)
 
